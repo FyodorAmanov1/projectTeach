@@ -4,6 +4,7 @@ import { OpenAI } from "openai";
 const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1",
   apiKey: import.meta.env.VITE_HF_TOKEN || "",
+  dangerouslyAllowBrowser: true, // Allow browser usage
 });
 
 export interface ChatMessage {
