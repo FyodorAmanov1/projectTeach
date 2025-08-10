@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
 import { Chat, Message } from '../types';
 import { generateId } from '../utils/helpers';
-import { teacherAPI } from '../services/teacherApi';
 import MessageRenderer from './MessageRenderer';
+import { generateChatResponse } from '../services/huggingfaceApi';
 
 interface ChatInterfaceProps {
   chat: Chat | undefined;
@@ -60,14 +60,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chat, onUpdateChat, onNew
     setMessage('');
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual API call)
     try {
-      const teacherResponse = await teacherAPI.generateResponse(message, currentChat.messages);
-      setCurrentResponse(teacherResponse);
+      const apiMessages = updatedChat.messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await generateChatResponse(apiMessages);
       
       const assistantMessage: Message = {
         id: generateId(),
-        content: teacherResponse.content,
+        content: response.content || "I'm sorry, I couldn't generate a response.",
         role: 'assistant',
         timestamp: new Date()
       };
