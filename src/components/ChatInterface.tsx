@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
 import { Chat, Message } from '../types';
 import { generateId } from '../utils/helpers';
+import { teacherAPI } from '../services/teacherApi';
+import MessageRenderer from './MessageRenderer';
 
 interface ChatInterfaceProps {
   chat: Chat | undefined;
@@ -12,6 +14,7 @@ interface ChatInterfaceProps {
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ chat, onUpdateChat, onNewChat }) => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentResponse, setCurrentResponse] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -59,11 +62,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chat, onUpdateChat, onNew
 
     // Simulate AI response (replace with actual API call)
     try {
-      const aiResponse = await simulateAIResponse(message);
+      const teacherResponse = await teacherAPI.generateResponse(message, currentChat.messages);
+      setCurrentResponse(teacherResponse);
       
       const assistantMessage: Message = {
         id: generateId(),
-        content: aiResponse,
+        content: teacherResponse.content,
         role: 'assistant',
         timestamp: new Date()
       };
@@ -94,173 +98,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chat, onUpdateChat, onNew
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const simulateAIResponse = async (userMessage: string): Promise<string> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
-    const lowerMessage = userMessage.toLowerCase();
-    
-    // Algorithm-specific responses
-    if (lowerMessage.includes('sorting') || lowerMessage.includes('sort')) {
-      return `Great question about sorting algorithms! Here are the main sorting algorithms you should know:
-
-**Bubble Sort** - O(n²) time complexity
-- Simple but inefficient for large datasets
-- Good for educational purposes
-
-**Quick Sort** - O(n log n) average, O(n²) worst case
-- Divide and conquer approach
-- Very efficient in practice
-
-**Merge Sort** - O(n log n) guaranteed
-- Stable sorting algorithm
-- Good for large datasets
-
-**Heap Sort** - O(n log n) time complexity
-- In-place sorting algorithm
-- Uses binary heap data structure
-
-Would you like me to explain any of these in detail or show you implementation examples?`;
-    }
-    
-    if (lowerMessage.includes('binary search') || lowerMessage.includes('search')) {
-      return `Binary search is a fundamental algorithm! Here's what you need to know:
-
-**Time Complexity:** O(log n)
-**Space Complexity:** O(1) iterative, O(log n) recursive
-
-**Key Requirements:**
-- Array must be sorted
-- Uses divide and conquer strategy
-
-**Basic Algorithm:**
-1. Find the middle element
-2. Compare with target
-3. Eliminate half the search space
-4. Repeat until found or exhausted
-
-**Implementation tip:** Always be careful with the boundary conditions to avoid infinite loops.
-
-Would you like to see a code example or practice some binary search problems?`;
-    }
-    
-    if (lowerMessage.includes('dynamic programming') || lowerMessage.includes('dp')) {
-      return `Dynamic Programming is a powerful problem-solving technique! Here's a structured approach:
-
-**Core Principles:**
-1. **Optimal Substructure** - Solution can be constructed from optimal solutions of subproblems
-2. **Overlapping Subproblems** - Same subproblems are solved multiple times
-
-**Common Patterns:**
-- **Fibonacci Sequence** - Classic example
-- **Knapsack Problems** - Resource optimization
-- **Longest Common Subsequence** - String problems
-- **Coin Change** - Counting problems
-
-**Approaches:**
-- **Top-down (Memoization)** - Recursive with caching
-- **Bottom-up (Tabulation)** - Iterative approach
-
-**Tip:** Start by identifying the recurrence relation, then optimize with memoization.
-
-Which DP pattern would you like to explore further?`;
-    }
-    
-    if (lowerMessage.includes('graph') || lowerMessage.includes('tree')) {
-      return `Graph and Tree algorithms are essential for many problems! Here's an overview:
-
-**Tree Traversals:**
-- **Preorder** - Root, Left, Right
-- **Inorder** - Left, Root, Right (gives sorted order for BST)
-- **Postorder** - Left, Right, Root
-- **Level Order** - Breadth-first traversal
-
-**Graph Algorithms:**
-- **DFS (Depth-First Search)** - Explore as far as possible
-- **BFS (Breadth-First Search)** - Explore neighbors first
-- **Dijkstra's Algorithm** - Shortest path (weighted)
-- **Union-Find** - Detect cycles, connected components
-
-**Common Applications:**
-- Finding connected components
-- Detecting cycles
-- Shortest path problems
-- Topological sorting
-
-What specific graph or tree problem would you like to discuss?`;
-    }
-
-    if (lowerMessage.includes('time complexity') || lowerMessage.includes('big o')) {
-      return `Understanding time complexity is crucial for algorithm analysis! Here's a comprehensive guide:
-
-**Common Time Complexities (from best to worst):**
-- **O(1)** - Constant time (hash table lookup)
-- **O(log n)** - Logarithmic (binary search)
-- **O(n)** - Linear (array traversal)
-- **O(n log n)** - Linearithmic (efficient sorting)
-- **O(n²)** - Quadratic (nested loops)
-- **O(2^n)** - Exponential (recursive Fibonacci)
-- **O(n!)** - Factorial (traveling salesman)
-
-**Analysis Tips:**
-- Drop constants and lower-order terms
-- Focus on the worst-case scenario
-- Consider input size growth
-- Analyze loops and recursive calls
-
-**Space Complexity:** Don't forget to consider memory usage!
-
-Would you like me to analyze the complexity of a specific algorithm?`;
-    }
-    
-    // General responses
-    const responses = [
-      `That's an interesting algorithm question! Let me help you understand this concept better. 
-
-Algorithm design often involves trade-offs between time complexity, space complexity, and implementation simplicity. When approaching any problem, I recommend:
-
-1. **Understand the problem** - What are the inputs and expected outputs?
-2. **Consider constraints** - What are the limits on input size?
-3. **Think of approaches** - Brute force first, then optimize
-4. **Analyze complexity** - Time and space requirements
-5. **Code and test** - Implementation with edge cases
-
-What specific aspect would you like to dive deeper into?`,
-      
-      `Great question! Algorithm learning is all about practice and understanding patterns. Here are some key strategies:
-
-**Problem-Solving Approach:**
-- Start with simple examples
-- Identify patterns and common techniques
-- Practice similar problems to reinforce concepts
-- Don't just memorize - understand the 'why'
-
-**Common Algorithm Categories:**
-- Array/String manipulation
-- Two pointers technique
-- Sliding window
-- Hash maps for optimization
-- Recursion and backtracking
-- Dynamic programming
-
-Would you like to practice problems in any of these categories?`,
-
-      `Excellent! That's exactly the kind of thinking that leads to algorithmic mastery. Let me break this down:
-
-When solving algorithm problems, always consider:
-- **Input validation** - Handle edge cases
-- **Algorithm choice** - Best approach for the constraints
-- **Optimization opportunities** - Can we do better?
-- **Code clarity** - Readable and maintainable
-
-The key is to build your problem-solving toolkit gradually. Each algorithm you learn becomes a tool you can use for future problems.
-
-What would you like to explore next?`
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -324,8 +161,16 @@ What would you like to explore next?`
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-800 text-gray-100 border border-gray-700'
               }`}>
-                <div className="whitespace-pre-wrap break-words">
-                  {msg.content}
+                <div className="whitespace-pre-wrap break-words prose prose-invert max-w-none prose-sm">
+                  {msg.role === 'assistant' && msg === chat.messages[chat.messages.length - 1] && currentResponse ? (
+                    <MessageRenderer
+                      content={msg.content}
+                      codeExamples={currentResponse.codeExamples}
+                      relatedTopics={currentResponse.relatedTopics}
+                    />
+                  ) : (
+                    <MessageRenderer content={msg.content} />
+                  )}
                 </div>
               </div>
             </div>
