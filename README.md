@@ -1,127 +1,47 @@
-# Algorithm Learning Assistant
+# projectTeach · Algorithm Learning Assistant
 
-A modern, interactive platform for learning algorithms and data structures. This application combines an AI-powered chatbot with a practical coding interface to help users learn and practice algorithmic problem-solving.
+**Move between asking about an algorithm and exploring a coding exercise in the same interface.**
 
-## Features
+projectTeach is a React and TypeScript prototype for learning algorithms and data structures. It combines a conversational view, code-formatted explanations, persistent local chat history and a practice workspace built with Vite and Tailwind CSS.
 
-### 1. Interactive Chat Interface
-- Real-time AI-powered responses using Hugging Face's API
-- Markdown support for rich text formatting
-- Syntax-highlighted code examples
-- Chat history persistence
-- Related topics suggestions
+## What you can explore
 
-### 2. Practice Environment
-- Collection of curated algorithm problems
-- Different difficulty levels (Easy, Medium, Hard)
-- Interactive code editor
-- Real-time test execution
-- Problem categorization and filtering
-- Problem descriptions with examples and constraints
+- Create, switch between and delete algorithm-learning conversations.
+- Keep conversation history in browser local storage.
+- Read explanations and formatted code examples.
+- Browse practice problems by topic, search term and difficulty.
+- Load starter code and inspect the example-result interface.
+- Use the responsive sidebar and separate chat/practice views.
 
-### 3. User Interface
-- Modern, responsive design
-- Dark theme optimized for coding
-- Split-pane layout for efficient workspace usage
-- Mobile-friendly interface
-- Persistent chat history
+The practice runner currently **simulates pass/fail outcomes**; it does not execute or grade the submitted code. Its results demonstrate the interface interaction, not the correctness of a solution.
 
-## Tech Stack
+## Chat integration
 
-- **Frontend Framework**: React with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS with Typography plugin
-- **Icons**: Lucide React
-- **AI Integration**: Hugging Face API
-- **Code Formatting**: ESLint
-- **State Management**: React Hooks and Context
-- **Package Manager**: npm
+The active chat component calls the Hugging Face router through [src/services/huggingfaceApi.ts](src/services/huggingfaceApi.ts). A separate [teacherApi.ts](src/services/teacherApi.ts) contains a topic-oriented knowledge base and response logic. These are distinct paths; the existence of the local knowledge base does not mean it handles the active chat requests.
 
-## Project Structure
+## Run locally
 
-```
-src/
-├── components/          # React components
-│   ├── ChatInterface.tsx    # Main chat interface
-│   ├── CodeBlock.tsx       # Code display component
-│   ├── MessageRenderer.tsx # Message formatting
-│   ├── PracticeInterface.tsx # Practice environment
-│   └── Sidebar.tsx        # Navigation sidebar
-├── services/           # API and service integrations
-│   ├── huggingfaceApi.ts  # AI API integration
-│   └── teacherApi.ts      # Algorithm teaching logic
-├── types/             # TypeScript type definitions
-├── utils/             # Helper functions
-└── App.tsx           # Main application component
+Use Node.js/npm, then run from the repository root:
+
+```bash
+npm install
+npm run dev
 ```
 
-## Setup Instructions
+Open the local URL printed by Vite. The UI and practice demonstration can be inspected independently of a successful remote chat response. Chat needs compatible provider access and the configuration expected by its service module.
 
-1. **Prerequisites**
-   - Node.js (version 16 or higher)
-   - npm (Node Package Manager)
+The current adapter reads `VITE_HF_TOKEN` in the browser. Vite client variables are exposed to users of the built application; a public deployment should move authenticated model requests behind a server endpoint rather than ship a private provider token.
 
-2. **Installation**
-   ```bash
-   # Clone the repository
-   git clone [repository-url]
+## Code map
 
-   # Navigate to project directory
-   cd project
+| File | Responsibility |
+|---|---|
+| [src/App.tsx](src/App.tsx) | View switching and conversation state |
+| [ChatInterface](src/components/ChatInterface.tsx) | Conversation interaction |
+| [PracticeInterface](src/components/PracticeInterface.tsx) | Problem selection and simulated results |
+| [huggingfaceApi](src/services/huggingfaceApi.ts) | External chat adapter |
+| [API.md](API.md) | Additional design and integration notes |
 
-   # Install dependencies
-   npm install
-   ```
+## Scope
 
-3. **Environment Configuration**
-   Create a `.env` file in the root directory:
-   ```
-   VITE_HF_TOKEN=your_huggingface_token
-   ```
-
-4. **Development**
-   ```bash
-   # Start development server
-   npm run dev
-   ```
-
-5. **Build**
-   ```bash
-   # Create production build
-   npm run build
-   ```
-
-## Features in Detail
-
-### Chat Interface
-- **Message Types**: Supports user and AI assistant messages
-- **Code Highlighting**: Automatic syntax highlighting for code snippets
-- **Markdown Support**: Rich text formatting for better readability
-- **Responsive Design**: Adapts to different screen sizes
-- **Local Storage**: Persists chat history between sessions
-
-### Practice Environment
-- **Problem Categories**: Various algorithmic topics
-- **Difficulty Levels**: Easy, Medium, Hard
-- **Test Cases**: Interactive test execution
-- **Code Editor**: Syntax highlighting and auto-formatting
-- **Filter & Search**: Easy problem discovery
-
-### Teacher API
-- **Algorithm Knowledge Base**: Comprehensive algorithm information
-- **Dynamic Responses**: Context-aware AI responses
-- **Code Examples**: Practical implementation examples
-- **Related Topics**: Suggests related learning paths
-- **Multiple Programming Paradigms**: Covers various approaches to problems
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+This repository demonstrates an educational frontend and a model-service adapter. It does not yet include an isolated code-execution backend, account synchronization or evidence that the tutoring improves learning outcomes. Saved history belongs to the current browser, not a shared account.
